@@ -1,0 +1,110 @@
+\documentclass{article}
+
+% if you need to pass options to natbib, use, e.g.:
+% \PassOptionsToPackage{numbers, compress}{natbib}
+% before loading nips_2017
+%
+% to avoid loading the natbib package, add option nonatbib:
+% \usepackage[nonatbib]{nips_2017}
+
+\usepackage{nips_2017}
+
+% to compile a camera-ready version, add the [final] option, e.g.:
+% \usepackage[final]{nips_2017}
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+% set imports
+\usepackage{ntheorem}       % theorem writing
+\usepackage{cleveref}       % clever references
+\usepackage{graphicx}       % for images
+\usepackage[table,xcdraw]{xcolor} % for tables
+\usepackage{natbib}            % bibliography
+\usepackage{amsmath, amssymb}  % math
+\usepackage{bm}                % ?
+\usepackage{subcaption}        % images
+\usepackage{hyperref}          % linked refs
+
+% set paths
+\graphicspath{{./fig/}}
+
+\title{Attacking Speaker Recognition with \\Deep Generative Models}
+% The \author macro works with any number of authors. There are two
+% commands used to separate the names and addresses of multiple
+% authors: \And and \AND.
+%
+% Using \And between authors leaves it to LaTeX to determine where to
+% break the lines. Using \AND forces a line break at that point. So,
+% if LaTeX puts 3 of 4 authors names on the first line, and the last
+% on the second line, try using \AND instead of \And before the third
+% author name.
+
+\author{
+  Anish Doshi \\
+  UC Berkeley \\
+  Berkeley, 94709 \\
+  \texttt{apdoshi@berkeley.edu} \\
+  \And
+  Wilson Cai\\
+  UC Berkeley\\
+  \texttt{wcai@berkeley.edu} \\
+  \And
+  Rafael Valle \\
+  Center for New Music and Audio Technologies \\
+  UC Berkeley\\
+  \texttt{rafaelvalle@berkeley.edu} \\
+}
+
+\begin{document}
+% \nipsfinalcopy is no longer used
+
+\maketitle
+
+\begin{abstract}
+    In this paper we investigate targeted and untargeted attacks on speaker
+    recognition systems. We first investigate the efficiency of SampleRNN 
+    and Wavenet in fooling GMM-UBM and CNN speaker recognizers. We design
+    untargeted and targetted attacks based on the GAN framework. We propose  
+    a modification of the WGAN objective function to make use of data that is 
+    real but not from the class being learned. Our method if efficient in 
+    performing targetted and untargeted attacks, thus raising attention to
+    issues related with security. 
+\end{abstract}
+
+% setup theorems 
+\theoremseparator{:}
+\newtheorem{hyp}{Hypothesis}
+
+\section{Introduction} \label{sec:introduction}
+\input{intro}
+%
+\section{Related work}\label{sec:related_work}
+\input{related_work}
+%
+\section{Method}\label{sec:method}
+\input{method}
+%
+\section{Results on existing methods}\label{sec:res_existing}
+\input{res_existing}
+%
+\section{Results on adversarial methods}\label{sec:res_adversarial}
+\input{res_adversarial}
+%
+\section{Discussion and Conclusion}\label{sec:conclusions}
+\input{conclusions}
+%
+
+\subsubsection*{Acknowledgments}
+\input{acknowledgments}
+
+\section*{References}
+\bibliographystyle{plain}
+\bibliography{references.bib}
+
+\end{document}

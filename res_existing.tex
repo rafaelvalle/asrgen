@@ -1,0 +1,10 @@
+We used the samples produced with WaveNet and SampleRNN, as well as Mel-Spectrograms generated with improved WGAN, to perform adversarial attacks to the neural speaker recognition system. 
+
+\subsection{WaveNet} % (fold)
+\label{sub:res-WaveNet}
+We attempted to replicate the model described in~\cite{van2016wavenet} but, unfortunately, we do not have access to Google's computing power nor to the North American Speech dataset Google used to train the WaveNet model that produced the samples referenced in \cite{van2016wavenet}. Nonetheless, we used the data from CSTR VCTK to train speaker dependent WaveNet speech synthesis model that converged to producing speech that resembled the speakers voice but sounded like babbling.
+% subsection WaveNet (end)
+\subsection{sampleRNN} % (fold)
+\label{sub:samplernn}
+We also tested samples from sampleRNN \cite{mehri2016samplernn}, another autoregressive architecture that has been successfully used to generate both speech and music samples. SampleRNN uses a hierarchical structure of deep RNNs to model dependencies in the sample sequence. Each deep RNN operates at a different temporal resolution so as to model both long term and short term dependencies. We generated samples from the three-tiered variant, trained on the Blizzard 2013 dataset \cite{prahallad2013blizzard}, a 300 hour corpus of a single female speaker's narration. We also downloaded 10 second samples from the original paper's online repository at \texttt{https://soundcloud.com/samplernn/sets}, which we qualitatively found to have less noise than our generated ones. 
+% subsection SampleRNN (end)

@@ -1,0 +1,31 @@
+Generative models for speech can produce fake\footnote{We use the term fake to refer to
+computer generated samples} samples that look very similar to real samples,
+leading humans to believe that the fake samples are real.
+WaveNet~\cite{van2016wavenet} is a generative neural network trained end-to-end
+to model quantized audio waveforms that has produced impressive results for conditional, speaker and text, generation of speech audio. The model is fully probabilistic and autoregressive, using a stack of causal convolutional layers to condition the predictive distribution for each audio sample on all previous ones; 
+
+SampleRNN~\cite{mehri2016samplernn}, is another autoregressive architecture that
+has been successfully used to generate both speech and music samples. SampleRNN
+uses a hierarchical structure of deep RNNs to model dependencies in the sample
+sequence. Each deep RNN operates at a different temporal resolution so as to
+model both long term and short term dependencies. Another impressive model is
+Adobe's VoCo~\cite{adobe2017voco}. Although VoCo's research is unpublished,
+Adobe its hability to textit{edit a recorded audio clip via text and make
+a audio clip of someone saying sentence that he never said!}. Training the model
+requires as litle as 20 minutes of speech.
+
+Another interesting framework for generative models are Generative Adversarial
+Networks (GAN) framework proposed by~\cite{goodfellow2014generative}, in which a
+\textit{generator} network is trained to learn a function from noise to samples
+that approximate the real data distribution. Simultaneously, a
+\textit{discriminator} network is trained to identify whether a sample came from
+the real distribution or not - i.e., it is trained to try to output 1 if a sample is real, and 0 if a sample is fake. The generator and discriminator can be arbitrary networks.
+
+In the context of deep learning architectures, adversarial examples use small
+perturbations to the original inputs, normally imperceptible to humans, to
+obtain an incorrect, target or untargeted, output from the neural network. In
+their brilliant papers, ~\cite{szegedy2013intriguing} and
+~\cite{goodfellow2014explaining} analyze the origin of adversarial attacks and
+describe simple and very efficient techniques for adversarial attacks, such as the fast gradient sign method. 
+
+In the vision domain, ~\cite{sharif2016accessorize} describe a technique for attacking facial recognition systems. Their attacks are physically realizable and inconspicuous, allowing an attacker to impersonate another individual. In the speech domain,~\cite{carlini2016hidden} describe attacks on speech-recognition systems that use sounds that are hard to recognize by humans but interpreted as specific commands by speech-recognition systems.
