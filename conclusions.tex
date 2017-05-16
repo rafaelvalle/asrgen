@@ -1,3 +1,13 @@
-In this paper we have investigated the use of speech generative models to perform adversarial attacks on speaker recognition systems. We show that the autoregressive models we trained, i.e. SampleRNN and WaveNet, were not able to fool the GMM-UBM and CNN speaker recognizers we built. On the other hand, we show that adversarial examples generated with GAN networks are successful in performing targeted and untargeted adversarial attacks. A pertinent argument against the validity of the GMM-UBM tests lies on the fact that GMM-UBM models have high precision and would not generalize to speech in different conditions, e.g. different room and microphone conditions. First, it is not within the scope of this paper to build a speaker recognition system that is invariant to room and microphone conditions. Second, given that the speaker recognition models, GMM-UBM and CNN, have good performance on test data and that WaveNet and SampleRNN goal is to replicate speech data that is from a speaker with similar and fixed microphone and room conditions, it is expected that the outputs of these generative models should be properly classified by the speaker recognition system.
+In this paper we have investigated the use of speech generative models to perform adversarial attacks on speaker recognition systems. We show that the autoregressive models we trained, i.e. SampleRNN and WaveNet, were not able to fool the CNN speaker recognizers we built. On the other hand, we show that adversarial examples generated with GAN networks are successful in performing targeted and untargeted adversarial attacks. 
+%A pertinent argument against the validity of the GMM-UBM tests lies on the fact
+%that GMM-UBM models have high precision and would not generalize to speech in
+%different conditions, e.g. different room and microphone conditions. First, it
+%is not within the scope of this paper to build a speaker recognition system
+%that is invariant to room and microphone conditions. Second, given that the
+%speaker recognition models, GMM-UBM and CNN, have good performance on test data
+%and that WaveNet and SampleRNN goal is to replicate speech data that is from a
+%speaker with similar and fixed microphone and room conditions, it is expected
+%that the outputs of these generative models should be properly classified by
+%the speaker recognition system.%
 
-On the other hand, we show that targeted and untargeted adversarial attacks with the GAN framework are efficient on the CNN speaker classifier trained by us. With this paper we hope to raise attention to issues that generative models bring to security and biometric systems. We foresee that samples produced with generative models have a signature that can be used to identify the source of the data and leave this investigation for future work.
+With this paper we hope to raise attention to issues that generative models bring to security and biometric systems. We foresee that samples produced with generative models have a signature that can be used to identify the source of the data and leave this investigation for future work.
