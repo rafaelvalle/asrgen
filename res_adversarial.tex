@@ -119,9 +119,11 @@ the GAN). The second one used an $\alpha$ of 1 combined with modifications to
 the network parameters, including different weight initialization, learning
 rates and addition of gaussian noise to the target speaker data. We invite
 readers to our github repo for details. Results are demonstrated in Figure
-\ref{fig:confusion_matrices}: the confusion matrices in ~\ref{fig:conf_mat_cnn} 
-and ~\ref{fig:conf_mat_cnn_spk0} show that all energy is concentrated in the
-targeted speaker ids, 1 and 0 respectively.
+\ref{fig:confusion_matrices}: the histogram of predictions in Figure
+~\ref{fig:pred_comp_spk0} shows that for the Mixed loss most of the energy is
+concentrated on the target speaker 0. The improved WGAN loss achieves 0.39 error
+rate and our mixed loss achieves 0.11 error rate, producing a 77\%
+increase in accuracy. 
 \begin{figure}[t]
     \centering
     \begin{subfigure}[b]{0.3\textwidth}
@@ -130,16 +132,10 @@ targeted speaker ids, 1 and 0 respectively.
         \label{fig:conf_mat_cnn_knn}
     \end{subfigure}
     \quad
-    \begin{subfigure}[b]{0.3\textwidth}
-        \includegraphics[width=\textwidth]{./fig/conf_mat_cnn_knn_targeted.png}
-        \caption{Confusion matrix of targeted attacks with $\alpha = 0.1$}
-        \label{fig:conf_mat_cnn}
-    \end{subfigure}
-    \quad
-    \begin{subfigure}[b]{0.3\textwidth}
-        \includegraphics[width=\textwidth]{./fig/conf_mat_cnn_knn_spk0.png}
-        \caption{Confusion matrix of targeted attacks with $\alpha = 1$}
-        \label{fig:conf_mat_cnn_spk0}
+    \begin{subfigure}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{./fig/pred_comparisson_spk0.png}
+        \caption{Histogram of predictions given improved WGAN and mixed loss models.}
+        \label{fig:pred_comp_spk0}
     \end{subfigure}
     \caption{Confusion matrix of targeted attacks}
     \label{fig:confusion_matrices}
