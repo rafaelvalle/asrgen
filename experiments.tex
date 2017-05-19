@@ -1,6 +1,6 @@
 \subsection{WGAN setup}
 In our experiments, we trained a WGAN-GP
-to produce spectrograms from 1 target speaker, against a set of over 100 "other" speakers. On each critic
+to produce mel-spectrograms from 1 target speaker, against a set of over 101 "other" speakers. On each critic
 iteration, we fed it with a batch of samples from one target speaker, 
 and a batch of data uniformly sampled from the other speakers. \\ We used two popular
 architectures for generator/critic pairs: 
@@ -8,9 +8,8 @@ architectures for generator/critic pairs:
     \item \textit{DCGAN}~\cite{radford2015unsupervised} models the generator as a series of deconvolutional layers with ReLU activations, and the discriminator as a series of convolutional ones with leaky ReLU activations. Both architectures use batch normalization after each layer.
     \item \textit{ResNet}~\cite{ledig2016photo} models the generator and discriminator each as very deep convnets (30 layers in our experiments) with upsampling/downsampling respectively. Residual (skip) connections are added every few layers to make training easier.
 \end{itemize}
-Initially, we were able to converge the targeted loss model used the same parameters as \cite{gulrajani2017improved}, namely 5 critic iterations per generator iteration, a gradient penalty weight of 10, and batch size of 64. Both the generator and critic were trained using the Adam optimizer \cite{kingma2014adam}. However, under these parameters we found that the highest $\alpha$ weight we could successfully use was 0.1 (we found that not including this scaling factor led to serious overfitting and poor convergence of the GAN). \\ The drawback of this approach is that the critic is not fully trained to discriminate against other speakers' data. In order to converge a model with $\alpha$ as 1, we made several modifications to 
-the network parameters. We changed the standard deviation of the DCGAN discriminator's weights to be 0.05. To accommodate the critic's access to additional data in the mixed loss function (4), we increased the generator's learning rate to $1e^{-4}$, whereas the critic's learning rate was kept at $1e^{-5}$. Finally, we added of Gaussian noise to the target speaker data to prevent overfitting. 
-
+Initially, we were able to converge the targeted loss model used the same parameters as \cite{gulrajani2017improved}, namely 5 critic iterations per generator iteration, a gradient penalty weight of 10, and batch size of 64. Both the generator and critic were trained using the Adam optimizer \cite{kingma2014adam}. However, under these parameters we found that the highest $\alpha$ weight we could successfully use was 0.1 (we found that not including this scaling factor led to serious overfitting and poor convergence of the GAN). \\ In order to train a model with $\alpha$ set to 1, we made several modifications to 
+the setup, including changing the standard deviation of the DCGAN discriminator's weight initialization to 0.05 and iterations to 20. To accommodate the critic's access to additional data in the mixed loss function (4), we increased the generator's learning rate to $1e^{-4}$, whereas the critic's learning rate was kept at $1e^{-5}$. Finally, we added of Gaussian noise to the target speaker data to prevent overfitting. 
 
 \subsection{WaveNet}
 Due to constraints on computing power, we used samples from WaveNet models that had been pre-trained for 88 thousand iterations. Parameters of the models were kept the same as those in \cite{van2016wavenet}. \\
