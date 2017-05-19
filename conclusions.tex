@@ -1,4 +1,8 @@
-In this paper we have investigated the use of speech generative models to perform adversarial attacks on speaker recognition systems. We show that the autoregressive models we trained, i.e. SampleRNN and WaveNet, were not able to fool the CNN speaker recognizers we built. On the other hand, we show that adversarial examples generated with GAN networks are successful in performing targeted and untargeted adversarial attacks. 
+
+
+In this paper we have investigated the use of speech generative models to perform adversarial attacks on speaker recognition systems. We show that the autoregressive models we trained, i.e. SampleRNN and WaveNet, were not able to fool the CNN speaker recognizers we built. On the other hand, we show that adversarial examples generated with GAN networks are successful in performing targeted and untargeted adversarial attacks.
+
+A natural question to ask is whether existing speech synthesis architectures like WaveNet and SampleRNN can be augmented with an adversarial-type loss in the same way as GANs. Both WaveNet and SampleRNN are trained to minimize the cross entropy loss between their generated samples and the real data. If one could attach a term to this loss function in the same way (e.g., maximizing the l2 distance between the generated samples and the data from other speakers, and tuning the weight of this distance to allow convergence), perhaps such a modification could be made. This modification would valuable as well when considering more sophisticated architectures like \cite{wang2017tacotron}.
 %A pertinent argument against the validity of the GMM-UBM tests lies on the fact
 %that GMM-UBM models have high precision and would not generalize to speech in
 %different conditions, e.g. different room and microphone conditions. First, it
