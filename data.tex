@@ -1,11 +1,11 @@
-In this section we will describe the datasets used, the data engineering
-pipeline, including pre-processing and feature extraction, the speaker
-recognition models evaluated, and the adversarial attacks investigated in this paper.
+In this section we describe the datasets used and the data engineering
+pipeline, including pre-processing and feature extraction.
+%, the speaker recognition models evaluated, and the adversarial attacks investigated in this paper.%
 
 \subsection{Datasets}
-In our experiments we use three speech datasets, as shown in  
+In our experiments we use three speech datasets, as shown  
 in Table\ref{tbl:datasets}. The datasets used are public and provide audio clips
-of different lengths, quality, language and content.
+of different lengths, quality, language and content. In addition to the samples listed in Table\ref{tbl:datasets}, we used  globally conditioned sampleRNN and WaveNet fake samples available on the web. The fake samples are from the Blizzard dataset and CSTR VCTK (P280) respectively.
 
 \begin{table}[!h]
 \centering
@@ -42,5 +42,5 @@ onto 64 mel bands, with window size equal to 1024 samples and hop size equal to
 160 samples, i.e. 100ms long frames. Dynamic range compression is computed as
 described in~\cite{lukic2016speaker}, with $log(1 + C*M)$, where $C$ is a
 compression constant scalar set to $1000$ and $M$ is a matrix representing the
-Mel-Spectrogram. Training the GAN is also done with Mel-Spectrograms of 64 bands each.
+Mel-Spectrogram. Training the GAN is also done with Mel-Spectrograms of 64 bands and 64 frames image patch.
                         
