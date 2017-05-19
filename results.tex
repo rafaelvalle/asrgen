@@ -46,19 +46,25 @@ dataset, without mode collapsing.
         speech from the generative model.}
         \label{fig:histogram_untargeted}
     \end{subfigure}
+    \qquad
+    \begin{subfigure}[b]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{./fig/conf_mat_cnn_knn.png}
+        \caption{Confusion matrix of untargeted model. x-axis corresponds to predicted label, y-axis to ground truth.}
+        \label{fig:histogram_untargeted}
+    \end{subfigure}
     \caption{Summary of untargeted attacks. Red represents high confidence.}
-    \label{fig:histogram_summary}
+    \label{fig:conf_mat_cnn_knn}
 \end{figure}
 
-The models for targeted attacks can be trained in two manners: 1) 
+As we described earlier, the models for targeted attacks can be trained in two manners: 1) 
 conditioning the model on additional information, e.g. class labels, as
 described in~\cite{mirza2014conditional}; 2) using only data from the label 
 of interest. While the first approach might result in mode collapse, a drawback
 of the second approach is that the discriminator, and by consequence the
 generator, does not have access to universal\footnote{We draw a parallel with 
 Universal Background Models in speech.} properties of speech. In the targeted 
-attacks subsection \ref{sub:targeted} we propose a new objective function that allows 
-using the data from all speakers.  
+attacks subsection \ref{sub:targeted} we show results using our a new objective function that allows 
+using data from all speakers.  
 
 \subsubsection{Untargeted attacks}
 \label{sub:untargeted}
@@ -76,24 +82,31 @@ feature $\widehat G$. Utilizing the pre-trained KNN, each sample is assigned to
 the nearest speaker in the deep feature space. Therefore, we know which speaker
 our generated sample belongs to when we attack our CNN recognizer. We evaluate our
 controlled WGAN samples against the state-of-the-art CNN recognizer, and the
-confusion matrix can be found in Figure \ref{fig:conf_mat_cnn_knn}. Although not
-included in the figure, \textbf{neither WaveNet samples nor SampleRNN samples
-were able to attack the recognition model in the same way.}~\footnote{Unlike our
-method, neither were they successful in attacking a GMM-UBM speaker recognizer.}
+confusion matrix can be found in Figure \ref{fig:conf_mat_cnn_knn}. 
 
 
 \subsubsection{Targeted attacks}
+\label{sub:targeted}
+We ran all three models (WGAN-GP, SampleRNN, WaveNet) on a mixed corpus containing the entirety of the NIST 2004 corpus, a single speaker (280) from the VCTK Corpus, and the single speaker from the Blizzard dataset. The mixed corpus therefore contains 102 speakers. Samples were created from WaveNet globally conditioned on the single VCTK corpus speaker, and on SampleRNN trained only on data from the Blizzard dataset.
 Results are demonstrated in Figure
-\ref{fig:confusion_matrices}. The histogram of predictions in Figure
-~\ref{fig:pred_comp_spk0} shows that using the mixed loss model, most of the energy is concentrated on the target speaker 0. The improved WGAN loss achieves 0.39 error
-rate and our mixed loss achieves 0.11 error rate, producing a 77\%
-increase in accuracy. 
+\ref{fig:confusion_matrices}. Neither WaveNet samples nor sampleRNN samples
+were able to attack the recognition model in the same way. In both models, \textbf{none} of the predictions made by the classifier match the target speaker. \\ We also trained the WGAN-GP with mixed loss/without mixed loss on speaker 0. The histogram of predictions in Figure
+~\ref{fig:pred_comp_spk0} shows that using the mixed loss model, most of the energy is concentrated on the target speaker 0. The improved WGAN-GP loss achieves 0.38 error
+rate and our mixed loss achieves 0.12 error rate, producing a 75\%
+increase in accuracy. It is therefore clear that the WGAN-GP mixed loss framework is an improvement on the original loss function, which is expected given the network's access to additional speaker data.
+
 \begin{figure}[t]
     \centering
     \begin{subfigure}[b]{0.3\textwidth}
-        \includegraphics[width=\textwidth]{./fig/conf_mat_cnn_knn.png}
-        \caption{Confusion matrix of \\untargeted model}
-        \label{fig:conf_mat_cnn_knn}
+        \includegraphics[width=\textwidth]{./fig/pred_histogram_cathy.png}
+        \caption{Histogram of sampleRNN predictions. \textbf{Ground truth label: 100}.}
+        \label{fig:pred_sampleRNN}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}[b]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{./fig/pred_histogram_p280.png}
+        \caption{Histogram of WaveNet predictions. \textbf{Ground truth label: 101}.}
+        \label{fig:pred_wavenet}
     \end{subfigure}
     \quad
     \begin{subfigure}[b]{0.4\textwidth}
@@ -101,6 +114,6 @@ increase in accuracy.
         \caption{Histogram of predictions given improved WGAN and mixed loss models.}
         \label{fig:pred_comp_spk0}
     \end{subfigure}
-    \caption{Confusion matrix of targeted attacks}
+    \caption{Summary histograms of targeted attacks}
     \label{fig:confusion_matrices}
 \end{figure}
