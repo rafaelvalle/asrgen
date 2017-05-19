@@ -97,21 +97,19 @@ increase in accuracy. It is therefore clear that the WGAN-GP mixed loss framewor
 
 \begin{figure}[t]
     \centering
-    \begin{subfigure}[b]{0.3\textwidth}
+    \begin{subfigure}[b]{0.45\linewidth}
         \includegraphics[width=\textwidth]{./fig/pred_histogram_cathy.png}
-        \caption{Histogram of sampleRNN predictions. \textbf{Ground truth label: 100}.}
+        \caption{Histogram of sampleRNN predictions.\\\textbf{Ground truth label: 100}.}
         \label{fig:pred_sampleRNN}
-    \end{subfigure}
-    \quad
-    \begin{subfigure}[b]{0.3\textwidth}
+    \end{subfigure}  
+    \begin{subfigure}[b]{0.45\linewidth}
         \includegraphics[width=\textwidth]{./fig/pred_histogram_p280.png}
-        \caption{Histogram of WaveNet predictions. \textbf{Ground truth label: 101}.}
+        \caption{Histogram of WaveNet predictions.\\\textbf{Ground truth label: 101}.}
         \label{fig:pred_wavenet}
     \end{subfigure}
-    \quad
-    \begin{subfigure}[b]{0.4\textwidth}
+    \begin{subfigure}[b]{0.5\linewidth}
         \includegraphics[width=\textwidth]{./fig/pred_comparisson_spk0.png}
-        \caption{Histogram of predictions given improved WGAN and mixed loss models.}
+        \caption{Histogram of predictions given improved WGAN and mixed loss models. \textbf{Ground truth label: 0.}}
         \label{fig:pred_comp_spk0}
     \end{subfigure}
     \caption{Summary histograms of targeted attacks}
