@@ -1,12 +1,11 @@
-In this section, we describe our generative adversarial network (GAN), and its usage as a speech recognition attacker. 
+In this section, we describe our Generative Adversarial Network (GAN), and its usage as a speech recognition attacker. 
 \subsection{Model}
 The GAN framework proposed by~\cite{goodfellow2014generative} involves training a 
-\textit{generator} network, which is trained to learn a function from noise to samples
-that approximate the real data distribution. Simultaneously, a
+\textit{generator} network, which is trained to learn a function from noise to samples that approximate the real data distribution. Simultaneously, a
 \textit{discriminator} network is trained to identify whether a sample came from
 the real distribution or not - i.e., it is trained to try to output 1 if a sample is real, and 0 if a sample is fake. The generator and discriminator can be arbitrary networks.
 
-The GAN framework has been shown to be able to produce very realistic samples with low training overhead. However, since the generator is trained to minimize the Kullback-Leibler (KL) divergence between its constructed distribution and the real one, it suffers from an exploding loss term when the real distribution's support is not contained in the constructed one. To counter this, the \textit{Wasserstein GAN} \cite{arjovsky2017wasserstein} (WGAN) framework instead uses the Wasserstein (Earth-Mover) distance between distributions instead, which in many cases does not suffer from the same explosion of loss and gradient. Based on this, the loss functions of the generator and \textit{critic} (which no longer emits a simple probability, but rather an approximation of the Wasserstein distance between the fake distribution and real) become:
+The GAN framework has been shown to be able to produce very realistic samples with low training overhead. However, since the generator is trained to minimize the Kullback-Leibler (KL) divergence between its constructed distribution and the real one, it suffers from an exploding loss term when the real distribution's support is not contained in the constructed one. To counter this, the \textit{Wasserstein GAN} \cite{arjovsky2017wasserstein} (WGAN) framework instead uses the Wasserstein (Earth-Mover) distance between distributions instead, which in many cases does not suffer from the same explosion of loss and gradient. In the WGAN framework, the loss functions of the generator and \textit{critic} (which no longer emits a simple probability, but rather an approximation of the Wasserstein distance between the fake distribution and real) become:
 \begin{align}
     L_G &= -\underset{\boldsymbol{\widetilde{x}} \sim \mathbb{P}_{g}}{\mathbb{E}}  \big[D(\boldsymbol{\widetilde{x}})\big] \\
     L_C &= \underset{\boldsymbol{\widetilde{x}} \sim \mathbb{P}_{g}}{\mathbb{E}}  \big[D(\boldsymbol{\widetilde{x}})\big] - \underset{\boldsymbol{x} \sim \mathbb{P}_{r}}{\mathbb{E}}  \big[D(\boldsymbol{x})\big]
@@ -16,20 +15,19 @@ The original WGAN framework uses weight clipping to ensure that the critic satis
 \begin{align}
     L_C &= \underbrace{\underset{\boldsymbol{\widetilde{x}} \sim \mathbb{P}_{g}}{\mathbb{E}}  \big[D(\boldsymbol{\widetilde{x}})\big] - \underset{\boldsymbol{x} \sim \mathbb{P}_{r}}{\mathbb{E}}  \big[D(\boldsymbol{x})\big]}_\text{Original critic loss}  + \underbrace{\lambda \underset{\boldsymbol{\hat{x}} \sim \mathbb{P}_{\hat{x}}}{\mathbb{E}}  \big[(\lVert \nabla_{\boldsymbol{\hat{x}}} D(\boldsymbol{\hat{x}}) \rVert_2 - 1)^2\big]}_\text{Gradient Penalty}
 \end{align} \\
-In all of our experiments, we use the Wasserstein GAN with this gradient penalty (WGAN-GP), which we found makes the model converge better than regular WGAN or GAN. We will henceforth use WGAN, GAN, and WGAN-GP interchangeably to refer to WGAN-GP.
+In all of our experiments, we use the Wasserstein GAN with this gradient penalty (WGAN-GP), which we found makes the model converge better than regular WGAN or GAN. We will henceforth use WGAN, IWAGN, GAN, and WGAN-GP interchangeably to refer to WGAN-GP.
 \subsection{Attacks}
 Performing \textit{untargeted} attacks with the WGAN-GP (i.e., training the network to output speech samples that mimic the distribution of speech) is relatively straightforward - we simply train the WGAN-GP using all speakers in our dataset. However, the most natural attack is one that is \textit{targeted}: where the GAN is trained to directly fool
-a speaker recognition system, i.e., to produce samples that the system
-classifies as matching a target speaker with reasonable confidence. \\
-The first attempt was one in which we trained the WGAN-GP using data from only the target speaker. However, the generated samples did not fool
-the speaker recognition systems, which was likely due to the discriminator's lack of access to data from other speakers. To circumvent this, we propose a 
+a speaker recognition system, i.e., to produce samples that the system classifies as matching a target speaker with reasonable confidence. \\
+A naive approach for targeted attacks is to train the GAN on the data of the single target speaker. A drawback of this approach is that \textit{discriminator}, and by consequence the \textit{generator}, does not have access to universal properties of speech\footnote{We draw a parallel with 
+Universal Background Models in speech.}. To circumvent this problem, we propose a 
 modification to the critic's objective function that allows it to learn to 
 differentiate between not only real samples and generated samples, but also between real speech samples from a target 
 speaker and real speech samples from other speakers. We do this by adding a term 
 to the critic's loss that encourages its discriminator to classify real speech 
 samples from untargeted speakers as fake. From (3), the critic's loss $L_C$ changes to:
 \begin{align}
-    \underbrace{\underset{\boldsymbol{\widetilde{x}} \sim \mathbb{P}_{g}}{\mathbb{E}}  \big[D(\boldsymbol{\widetilde{x}})\big]}_\text{Generated Samples} \color{red} + \alpha * \underbrace{\underset{\boldsymbol{\dot{x}} \sim \mathbb{P}_{\dot{x}}}{\mathbb{E}}  \big[D(\boldsymbol{\dot{x}})\big]}_\text{Different Speakers} \color{black} - \underbrace{\underset{\boldsymbol{x} \sim \mathbb{P}_{r}}{\mathbb{E}}  \big[D(\boldsymbol{x})\big]}_\text{Real Speaker}  + \underbrace{\lambda \underset{\boldsymbol{\hat{x}} \sim \mathbb{P}_{\hat{x}}}{\mathbb{E}}  \big[(\lVert \nabla_{\boldsymbol{\hat{x}}} D(\boldsymbol{\hat{x}}) \rVert_2 - 1)^2\big]}_\text{Gradient Penalty}
+    \underbrace{\underset{\boldsymbol{\widetilde{x}} \sim \mathbb{P}_{g}}{\mathbb{E}}  \big[D(\boldsymbol{\widetilde{x}})\big]}_\text{Generated Samples} \color{red} +  \underbrace{\alpha * \underset{\boldsymbol{\dot{x}} \sim \mathbb{P}_{\dot{x}}}{\mathbb{E}}  \big[D(\boldsymbol{\dot{x}})\big]}_\text{Different Speakers} \color{black} - \underbrace{\underset{\boldsymbol{x} \sim \mathbb{P}_{r}}{\mathbb{E}}  \big[D(\boldsymbol{x})\big]}_\text{Real Speaker}  + \underbrace{\lambda \underset{\boldsymbol{\hat{x}} \sim \mathbb{P}_{\hat{x}}}{\mathbb{E}}  \big[(\lVert \nabla_{\boldsymbol{\hat{x}}} D(\boldsymbol{\hat{x}}) \rVert_2 - 1)^2\big]}_\text{Gradient Penalty}
 \end{align}
 where $P_{\hat{x}}$ is the distribution of samples from other speakers and
-$\alpha$ is a tunable scaling factor. 
+$\alpha$ is a tunable scaling factor. Note that (4) is no longer a direct approximation of the Wasserstein distance. Rather, it provides a balance of the distance between both the fake distribution and real one, and the distance between other speakers' distribution and the target speaker's one.  
