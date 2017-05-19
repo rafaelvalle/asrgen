@@ -3,7 +3,7 @@ critical applications in industries like banking, forensics, and home automation
 other domains, such industries have benefited from recent advancements in deep
 learning that lead to improved accuracy and trainability of the speech authentication systems.
 Despite the improvement in the efficiency of these systems, evidence shows that
-they can be susceptible to adversarial attacks\cite{wu2015spoofing}, thus motivating a current focus on understanding adversarial attacks (\cite{szegedy2013intriguing}, \cite{goodfellow2014explaining}) and finding countermeasures to detect and deflect them. 
+they can be susceptible to adversarial attacks\cite{wu2015spoofing}, thus motivating a current focus on designing AI-based systems that are provably correct with respect to mathematically-specified requirements~\cite{seshia2016towards}, including understanding adversarial attacks (\cite{szegedy2013intriguing}, \cite{goodfellow2014explaining}) and finding countermeasures to detect and deflect them. 
 
 Parallel to advancements in speech authentication, neural speech \textit{generation} (the process of using deep neural networks to generate speech) has also seen huge progress in recent years (\cite{wang2017tacotron}, \cite{arik2017deep}). 
 The combination of these advancements begs a natural question that has, to the
@@ -13,8 +13,7 @@ Are state-of-the-art speech authentication systems robust \\to adversarial attac
 \end{center}
 
 
-Generative Adversarial Networks (GANs) have recently been found to produce incredibly  authentic samples in a variety of fields. The core idea of GANs, a minimax game played between a generator network and a discriminator network, extends very naturally to the field of speaker authentication and spoofing. We will show that a variant of GAN training motivates the model's use as an attacking architecture.  \\
-
+Generative Adversarial Networks (GANs) have recently been found to produce incredibly  authentic samples in a variety of fields. The core idea of GANs, a minimax game played between a generator network and a discriminator network, extends naturally to the field of speaker authentication and spoofing. We show that a variant of GAN training motivates the model's use as an attacking architecture.  \\
 
 With regards to this question, we offer in this paper the following contributions:
 \begin{itemize}
