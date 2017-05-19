@@ -1,6 +1,6 @@
 This section investigates the output of speaker recognition systems when
-features computed from fake data generated with WaveNet and sampleRNN is used as
-input. As described in \ref{sub:speaker_recognition}, we train a speaker
+features computed from fake data generated with WaveNet and sampleRNN are used as
+input. As described in \ref{sub:speaker_recognition}, we train speaker
 recognition systems with several speakers, including the speakers used to train
 WaveNet and sampleRNN. None of the WaveNet or sampleRNN samples produced with
 our model or downloaded from the authors website were successful in targeted or 
@@ -11,9 +11,9 @@ untargetted attacks to our speaker recognition system.
 We attempted to replicate the model described in~\cite{van2016wavenet} but,
 unfortunately, we do not have access to Google's computing power nor to the
 North American Speech dataset Google used to train the WaveNet model that
-produced the samples referenced in \cite{van2016wavenet}. Nonetheless, we used
+produced the samples referenced in \cite{van2016wavenet}. We therefore used
 the data from CSTR VCTK to train speaker dependent WaveNet speech synthesis
-models that converged to producing speech that resembled the speakers voice but
+models that converged to producing speech that resembled the speaker's voice but
 sounded like babbling. 
 % subsection WaveNet (end)
 \subsection{sampleRNN} % (fold)

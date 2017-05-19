@@ -1,21 +1,26 @@
-Speaker recognition and authentication systems are being deployed for security
-critical applications such as banking, forensics, home automation, etc. Like
-other domains, these systems benefit from recent advancements in deep
-learning that lead to improved accuracy and trainability of such systems.
+Speaker authentication systems are increasingly being deployed for security
+critical applications in industries like banking, forensics, and home automation. Like
+other domains, such industries have benefited from recent advancements in deep
+learning that lead to improved accuracy and trainability of the speech authentication systems.
 Despite the improvement in the efficiency of these systems, evidence shows that
-they can be suspectible to adversarial attacks\cite{wu2015spoofing}, thus motivating a current trend
-focused understanding adversarial attacks (\cite{szegedy2013intriguing}, \cite{goodfellow2014explaining}) and finding countermeasures to detect of deflect them. 
+they can be susceptible to adversarial attacks\cite{wu2015spoofing}, thus motivating a current focus on understanding adversarial attacks (\cite{szegedy2013intriguing}, \cite{goodfellow2014explaining}) and finding countermeasures to detect and deflect them. 
 
-Parallel to these advancements, neural speech \textit{generation} (the process of using deep neural networks to generate human-sounding speech) has also seen huge progress (\cite{wang2017tacotron}, \cite{arik2017deep}). Generative Adversarial Networks (GANs) have recently been found to produce incredibly  authentic samples in a variety of fields. The core idea of GANs - namely the minimax game played between a generator network and a discriminator network - extends very naturally to the field of speaker authentication and spoofing. \\
+Parallel to advancements in speech authentication, neural speech \textit{generation} (the process of using deep neural networks to generate speech) has also seen huge progress in recent years (\cite{wang2017tacotron}, \cite{arik2017deep}). 
 The combination of these advancements begs a natural question that has, to the
-best of our knowledge, not been answered:
+best of our knowledge, not yet been answered:
 \begin{center}
-Are state-of-the-art speech recognition systems robust \\to adversarial attacks by speech generative models?
+Are state-of-the-art speech authentication systems robust \\to adversarial attacks by speech generative models?
 \end{center}
 
-More specifically, we contemplate this question and offer in this paper the following contributions:
+
+Generative Adversarial Networks (GANs) have recently been found to produce incredibly  authentic samples in a variety of fields. The core idea of GANs, a minimax game played between a generator network and a discriminator network, extends very naturally to the field of speaker authentication and spoofing. We will show that a variant of GAN training motivates the model's use as an attacking architecture.  \\
+
+
+With regards to this question, we offer in this paper the following contributions:
 \begin{itemize}
 \item We evaluate SampleRNN and WaveNet in their ability to fool text-independent state-of-the-art speaker recognizers.
 \item We propose strategies for untargeted attacks using Generative Adversarial Networks.
 \item We propose strategies for targeted attacks using a new objective function based on the improved Wasserstein GAN.
 \end{itemize}
+
+% The main evaluation metric for deep models has always been their qualitative ability to produce human-sounding speech. In this paper, we will argue that using speech authenticators as validation

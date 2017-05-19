@@ -1,0 +1,24 @@
+\subsection{WGAN setup}
+In our experiments, we trained a WGAN-GP
+to produce spectrograms from 1 target speaker, against a set of over 100 "other" speakers. On each critic
+iteration, we fed it with a batch of samples from one target speaker, 
+and a batch of data uniformly sampled from the other speakers. \\ We used two popular
+architectures for generator/critic pairs: 
+\begin{itemize}
+    \item \textit{DCGAN}~\cite{radford2015unsupervised} models the generator as a series of deconvolutional layers with ReLU activations, and the discriminator as a series of convolutional ones with leaky ReLU activations. Both architectures use batch normalization after each layer.
+    \item \textit{ResNet}~\cite{ledig2016photo} models the generator and discriminator each as very deep convnets (30 layers in our experiments) with upsampling/downsampling respectively. Residual (skip) connections are added every few layers to make training easier.
+\end{itemize}
+Initially, we were able to converge the targeted loss model used the same parameters as \cite{gulrajani2017improved}, namely 5 critic iterations per generator iteration, a gradient penalty weight of 10, and batch size of 64. Both the generator and critic were trained using the Adam optimizer \cite{kingma2014adam}. However, under these parameters we found that the highest $\alpha$ weight we could successfully use was 0.1 (we found that not including this scaling factor led to serious overfitting and poor convergence of the GAN). \\ The drawback of this approach is that the critic is not fully trained to discriminate against other speakers' data. In order to converge a model with $\alpha$ as 1, we made several modifications to 
+the network parameters. We changed the standard deviation of the DCGAN discriminator's weights to be 0.05. To accommodate the critic's access to additional data in the mixed loss function (4), we increased the generator's learning rate to $1e^{-4}$, whereas the critic's learning rate was kept at $1e^{-5}$. Finally, we added of Gaussian noise to the target speaker data to prevent overfitting. 
+
+
+\subsection{WaveNet}
+Due to constraints on computing power, we used samples from WaveNet models that had been pre-trained for 88 thousand iterations. Parameters of the models were kept the same as those in \cite{van2016wavenet}. \\
+The ability of WaveNet to perform \textit{untargeted} attacks amounts to using a model trained on an entire corpus. Targeted attacks are more difficult - we found that a single speaker's data was not enough to train WaveNet to converge successfully. To construct speaker-dependent samples, we relied on samples from pre-trained models that were \textit{globally conditioned} on speaker ID. Auditorily, such samples do sound very similar to the real speech of the ID in question. We ran the feature-extraction in section 3 on these samples to produce data fed to the classifier.
+ 
+% subsection WaveNet (end)
+\subsection{sampleRNN} % (fold)
+Similarly to WaveNet, we found that the best (least noisy) sampleRNN samples came from models which were pretrained with a high number of iterations. Accordingly, we obtained samples from the three-tiered architecture, trained on the
+Blizzard 2013 dataset \cite{prahallad2013blizzard}, which as mentioned in Section 3 is a 300 hour corpus of a single female speaker's narration. We also downloaded 10 second samples from the original paper's online repository at
+\texttt{https://soundcloud.com/samplernn/sets}, which we qualitatively found to have less noise than our generated ones. 
+% subsection SampleRNN (end)

@@ -1,45 +1,21 @@
-Generative models for speech can produce fake\footnote{We use the term fake to refer to
-computer generated samples} samples that look very similar to real samples,
-leading humans to believe that the fake samples are real.
-WaveNet~\cite{van2016wavenet} is a generative neural network trained end-to-end
-to model quantized audio waveforms that has produced impressive results for
-generation of speech audio conditioned on speaker and text. The model is fully
+Modern generative models are sophisticated enough to produce fake\footnote{We use the term fake to refer to
+computer generated samples} speech samples that can be indistinguishable from real human speech. Here, we provide a summary of some existing neural speech synthesis models and their architectures.
+WaveNet~\cite{van2016wavenet} is a generative neural network that is trained end-to-end
+to model quantized audio waveforms. The model is fully
 probabilistic and autoregressive, using a stack of causal convolutional layers
-to condition the predictive distribution for each audio sample on all previous ones; 
+to condition the predictive distribution for each audio sample on all previous ones. It has produced impressive results for generation of speech audio conditioned on speaker and text and has become a standard baseline for neural speech generative models. 
 
-SampleRNN~\cite{mehri2016samplernn}, is another autoregressive architecture that
+SampleRNN~\cite{mehri2016samplernn} is another autoregressive architecture that
 has been successfully used to generate both speech and music samples. SampleRNN
 uses a hierarchical structure of deep RNNs to model dependencies in the sample
 sequence. Each deep RNN operates at a different temporal resolution so as to
-model both long term and short term dependencies. Another impressive model is
-Adobe's VoCo~\cite{adobe2017voco}. Although VoCo's research is unpublished,
-Adobe its hability to \textit{edit a recorded audio clip via text and make
-a audio clip of someone saying sentence that he never said!}. Training the model
-requires as litle as 20 minutes of speech.
+model both long term and short term dependencies. 
 
-Another interesting framework for generative models is the Generative Adversarial
-Networks (GAN) framework proposed by~\cite{goodfellow2014generative}, in which a
-\textit{generator} network is trained to learn a function from noise to samples
-that approximate the real data distribution. Simultaneously, a
-\textit{discriminator} network is trained to identify whether a sample came from
-the real distribution or not - i.e., it is trained to try to output 1 if a sample is real, and 0 if a sample is fake. The generator and discriminator can be arbitrary networks.
 
-The GAN framework has been shown to be able to produce very realistic samples with low training overhead. However, since the generator is trained to minimize the Kullback-Leibler (KL) divergence between its constructed distribution and the real one, it suffers from an exploding loss term when the real distribution's support isn't contained in the constructed one. To counter this, the \textit{Wasserstein GAN} \cite{arjovsky2017wasserstein} (WGAN) framework instead uses the Wasserstein (Earth-Mover) distance between distributions instead, which in many cases does not suffer from the same explosion of loss and gradient. Based on this, the loss functions of the generator and \textit{critic} (which no longer emits a simple probability, but rather an approximation of the Wasserstein distance between the fake distribution and real) become:
-\begin{align}
-    L_G &= -\underset{\boldsymbol{\widetilde{x}} \sim \mathbb{P}_{g}}{\mathbb{E}}  \big[D(\boldsymbol{\widetilde{x}})\big] \\
-    L_C &= \underset{\boldsymbol{\widetilde{x}} \sim \mathbb{P}_{g}}{\mathbb{E}}  \big[D(\boldsymbol{\widetilde{x}})\big] - \underset{\boldsymbol{x} \sim \mathbb{P}_{r}}{\mathbb{E}}  \big[D(\boldsymbol{x})\big]
-\end{align}
-where $P_r$ is the real distribution, and $P_g$ the learnt distribution of the generator. \\
-The original WGAN framework uses weight clipping to ensure that the critic satisfies a Lipschitz condition. As pointed by \cite{gulrajani2017improved}, however, this clipping can lead to problems with gradient stability. Instead, \cite{gulrajani2017improved} suggest adding a gradient penalty to the critic's loss function, which indirectly tries to constrain the original critic's gradient to have norm close to 1. Equation (2) thus becomes (taken from \cite{gulrajani2017improved}):
-\begin{align}
-    L_C &= \underbrace{\underset{\boldsymbol{\widetilde{x}} \sim \mathbb{P}_{g}}{\mathbb{E}}  \big[D(\boldsymbol{\widetilde{x}})\big] - \underset{\boldsymbol{x} \sim \mathbb{P}_{r}}{\mathbb{E}}  \big[D(\boldsymbol{x})\big]}_\text{Original critic loss}  + \underbrace{\lambda \underset{\boldsymbol{\hat{x}} \sim \mathbb{P}_{\hat{x}}}{\mathbb{E}}  \big[(\lVert \nabla_{\boldsymbol{\hat{x}}} D(\boldsymbol{\hat{x}}) \rVert_2 - 1)^2\big]}_\text{Gradient Penalty}
-\end{align}
-
-In the context of deep learning architectures as the ones descriebd in this
-section, adversarial examples can make small perturbations to the original inputs, 
-normally imperceptible to humans, to obtain an incorrect, target or untargeted, 
-output from the neural network. In their brilliant papers, ~\cite{szegedy2013intriguing} and
+Recent work on deep learning architectures has also introduced the presence of \textit{adversarial examples}: small perturbations to the original inputs, normally imperceptible to humans, which nevertheless cause the architecture to generate an incorrect or deliberately chosen output. In their brilliant papers, ~\cite{szegedy2013intriguing} and
 ~\cite{goodfellow2014explaining} analyze the origin of adversarial attacks and
-describe simple and very efficient techniques for adversarial attacks, such as the fast gradient sign method. 
+describe simple and very efficient techniques for creating such perturbations, such as the fast gradient sign method. 
 
-In the vision domain, ~\cite{sharif2016accessorize} describe a technique for attacking facial recognition systems. Their attacks are physically realizable and inconspicuous, allowing an attacker to impersonate another individual. In the speech domain,~\cite{carlini2016hidden} describe attacks on speech-recognition systems that use sounds that are hard to recognize by humans but interpreted as specific commands by speech-recognition systems.
+In the vision domain, ~\cite{sharif2016accessorize} describe a technique for attacking facial recognition systems. Their attacks are physically realizable and inconspicuous, allowing an attacker to impersonate another individual. In the speech domain,~\cite{carlini2016hidden} describe attacks on speech-recognition systems which use sounds that are hard to recognize by humans but interpreted as specific commands by speech-recognition systems.
+
+To the best of our knowledge, GANs have not been used before for the purpose of speech synthesis. \cite{pascual2017segan} uses a conditional GAN for the purpose of speech \textit{enhancement}, i.e. taking as input a raw speech signal and outputting a denoised waveform. The model in \cite{chang2017learning} tackles the reverse problem of using GANs to learn certain representations given a speech spectrogram. We believe the use of spectrograms is a step in the right direction of GAN speech research, as using the raw waveform as input has highlighted current issues with using GANs with sequential modeling.
