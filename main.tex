@@ -1,13 +1,9 @@
+% Template for ICASSP-2018 paper; to be used with:
+%          spconf.sty  - ICASSP/ICIP LaTeX style file, and
+%          IEEEbib.bst - IEEE bibliography style file.
+% --------------------------------------------------------------------------
 \documentclass{article}
-
-% if you need to pass options to natbib, use, e.g.:
-% \PassOptionsToPackage{numbers, compress}{natbib}
-% before loading nips_2017
-%
-% to avoid loading the natbib package, add option nonatbib:
-% \usepackage[nonatbib]{nips_2017}
-
-\usepackage{nips_2017}
+\usepackage{spconf}
 
 % to compile a camera-ready version, add the [final] option, e.g.:
 % \usepackage[final]{nips_2017}
@@ -21,84 +17,65 @@
 \usepackage{nicefrac}       % compact symbols for 1/2, etc.
 \usepackage{microtype}      % microtypography
 % set imports
+\usepackage{nccmath}        % decrease equation font size
 \usepackage{ntheorem}       % theorem writing
 \usepackage{cleveref}       % clever references
 \usepackage{graphicx}       % for images
 \usepackage[table,xcdraw]{xcolor} % for tables
-\usepackage{natbib}            % bibliography
 \usepackage{amsmath, amssymb}  % math
 \usepackage{bm}                % ?
 \usepackage{subcaption}        % images
 \usepackage{hyperref}          % linked refs
+\usepackage{tikz}   % for graphs
+\usetikzlibrary{calc,intersections,through,scopes,arrows,decorations,backgrounds,positioning,fit,petri,automata,shapes}
+\tikzstyle{box} = [draw, rectangle, rounded corners, thick, node distance=4em,
+text width=3em, text centered, minimum height=3em]
+\tikzstyle{container} = [draw, rectangle, dashed, inner sep=2em]
+\tikzstyle{line} = [->, thick, -latex']
+
 
 % set paths
 \graphicspath{{./fig/}}
 
 \title{Attacking Speaker Recognition with \\Deep Generative Models}
-% The \author macro works with any number of authors. There are two
-% commands used to separate the names and addresses of multiple
-% authors: \And and \AND.
-%
-% Using \And between authors leaves it to LaTeX to determine where to
-% break the lines. Using \AND forces a line break at that point. So,
-% if LaTeX puts 3 of 4 authors names on the first line, and the last
-% on the second line, try using \AND instead of \And before the third
-% author name.
-
-\author{
-  Anish Doshi \\
-  UC Berkeley \\
-  Berkeley, 94709 \\
-  \texttt{apdoshi@berkeley.edu} \\
-  \And
-  Wilson Cai\\
-  UC Berkeley\\
-  Berkeley, 94709 \\
-  \texttt{wcai@berkeley.edu} \\
-  \And
-  Rafael Valle \\
-  Center for New Music and Audio Technologies \\
-  UC Berkeley \\
-  \texttt{rafaelvalle@berkeley.edu} \\
-}
+\name{Wilson Cai, Anish Doshi, Rafael Valle}
+\address{UC Berkeley}
 
 \begin{document}
-% \nipsfinalcopy is no longer used
-
 \maketitle
-
 \begin{abstract}
-    In this paper we investigate the ability of generative adversarial networks (GANs) to synthesize spoofing attacks on modern speaker recognition systems. We first show that the modern architectures of SampleRNN 
-    and WaveNet are unable to fool CNN-based speaker recognition systems. We propose  
-    a modification of the Wasserstein GAN objective function to make use of data that is 
-    real but not from the class being learned. Our method is able to perform both targeted and untargeted attacks against state of the art systems, which calls attention to issues related with security. 
+    In this paper we investigate the ability of generative adversarial networks
+    (GANs) to synthesize spoofing attacks on modern speaker recognition systems.
+    We first show that samples generated with SampleRNN and WaveNet are
+    unable to fool a CNN-based speaker recognition system. We propose  a
+    modification of the Wasserstein GAN objective function to make use of data
+    that is real but not from the class being learned. Our semi-supervised
+    learning method is able to perform both targeted and untargeted attacks,
+    raising questions related to security in speaker authentication systems. 
 \end{abstract}
 
-\section{Introduction} \label{sec:introduction}
+\section{INTRODUCTION} \label{sec:introduction}
 \input{intro}
 %
-\section{Related work}\label{sec:related_work}
+\section{RELATED WORK}\label{sec:related_work}
 \input{related_work}
 %
-\section{Data}\label{sec:data}
-\input{data}
+\section{ATTACKING SPEAKER RECOGNITION MODELS}\label{sec:spk_rec_atks}
+\input{attacking}
 %
-\section{Attacking speaker recognition models}\label{sec:spk_rec_atks}
-\input{spk_rec_atks}
+\section{EXPERIMENTAL SETUP}\label{sec:experiments}
+\input{experimental_setup}
 %
-\section{Adapting Wasserstein GAN for Attacks}\label{sec:wgan}
-\input{wgan}
-%
-\section{Experimental setup}\label{sec:experiments}\input{experiments}
-%
-\section{Results}\label{sec:results}
+\section{RESULTS}\label{sec:results}
 \input{results}
 %
-\section{Discussion and Conclusion}\label{sec:conclusions}
-\input{conclusions}
+\section{DISCUSSION AND CONCLUSION}\label{sec:conclusions}
+\input{discussion}
 %
+\vfill\pagebreak
 
-\bibliographystyle{plain}
-\bibliography{references.bib}
+
+\bibliographystyle{IEEEbib}
+\bibliography{references}
 
 \end{document}

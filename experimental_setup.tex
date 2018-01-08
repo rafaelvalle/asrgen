@@ -1,0 +1,145 @@
+\subsection{Datasets}
+In our experiments we use three speech datasets and one dataset with
+environmental sounds, as shown  in Table~\ref{tbl:datasets}. The datasets used
+are public and provide audio clips of different lengths, quality, language and
+content. In addition to the samples listed in Table~\ref{tbl:datasets}, we used
+globally conditioned sampleRNN and WaveNet fake samples available on the web.
+The samples generated with sampleRNN and WaveNet are from the Blizzard dataset
+and CSTR VCTK (P280) respectively.
+\begin{table}[!t]
+\resizebox{\columnwidth}{!}{
+\centering
+\begin{tabular}{lllll}
+                                                                     & \cellcolor[HTML]{C0C0C0}Speakers & \cellcolor[HTML]{C0C0C0}Language & \cellcolor[HTML]{C0C0C0}Duration & \cellcolor[HTML]{C0C0C0}Context \\ \cline{2-5} 
+\multicolumn{1}{l|}{\cellcolor[HTML]{C0C0C0}2013 Blizzard} & 1                                & English                          & 73 h                             & Book narration                  \\
+\multicolumn{1}{l|}{\cellcolor[HTML]{C0C0C0}CSTR VCTK}               & 109                    & English                          & 400 Sentences                    & Newspaper narration             \\
+\multicolumn{1}{l|}{\cellcolor[HTML]{C0C0C0}2004 NIST}               & 100                    & Multiple                         & 5 min / speaker                  & Conversational phone speech.    \\                     
+\multicolumn{1}{l|}{\cellcolor[HTML]{C0C0C0}ESC 50}                  & 50                     & N/A                             & 4 min / class                    & Environmental sounds.                          
+\end{tabular}
+}
+\bigskip
+\caption{Description of the datasets used in our experiments. }
+\label{tbl:datasets}
+\end{table}
+
+\subsection{Pre-processing}
+\label{sub:processdata}
+Data pre-processing is dependent on the model being trained. For SampleRNN and
+WaveNet, the raw audio is reduced to 16kHz and quantized using the $\mu$-law
+companding transformation as referenced in~\cite{mehri2016samplernn}
+and~\cite{van2016wavenet}. For the model based on the Wasserstein GAN,
+we pre-process the data by converting it to 16kHz and removing silences by using
+the WebRTC Voice Activity Detector (VAD) as referenced
+in~\cite{zeidan2014webrtc}. For the CNN speaker recognition system, the data is
+pre-processed by resampling to 16kHz when necessary and removing silences by
+using the aforemetioned VAD. 
+
+\subsection{Feature extraction}
+SampleRNN and WaveNet operate at the sample level, i.e. waveform, thus requiring
+no feature extraction. The features used for the neural speaker recognition
+system are based on Mel-Spectrograms with dynamic range compression. The
+Mel-Spectrogram is obtained by projecting a spectrogram onto a mel scale. We use
+the python library librosa to project the spectrogram
+onto 64 mel bands, with window size equal to 1024 samples and hop size equal to
+160 samples, i.e. 100ms long frames. Dynamic range compression is computed as
+described in~\cite{lukic2016speaker}, with $log(1 + C*M)$, where $C$ is a
+compression constant scalar set to $1000$ and $M$ is a matrix representing the
+Mel-Spectrogram. Training the GAN is also done with Mel-Spectrograms of 64 bands and 64 frames image patch.
+                        
+\subsection{Models}
+\subsubsection{WaveNet}
+Due to constraints on computing power and the extreme difficulty in training
+WaveNet~\footnote{Our community has not been able to replicate the results in
+Google's WaveNet paper}, we used samples from WaveNet models that had been
+pre-trained for 88 thousand iterations. Parameters of the models were kept the
+same as those in \cite{van2016wavenet}. \\ The ability of WaveNet to perform
+\textit{untargeted} attacks amounts to using a model trained on an entire
+corpus. Targeted attacks are more difficult - we found that a single speaker's
+data was not enough to train WaveNet to converge successfully. To construct
+speaker-dependent samples, we relied on samples from pre-trained models that
+were \textit{globally conditioned} on speaker ID. Based on informal listening
+experiments, such samples do sound very similar to the real speech of the
+speaker in question.  
+
+\subsubsection{sampleRNN}
+Similarly to WaveNet, we found that the best (least noisy) sampleRNN samples
+came from models which were pretrained with a high number of iterations.
+Accordingly, we obtained samples from the three-tiered architecture, trained on
+the Blizzard 2013 dataset \cite{prahallad2013blizzard}, which as mentioned in
+Section 3 is a 300 hour corpus of a single female speaker's narration. We also
+downloaded samples from online repositories, including samples from the original
+paper's online repository at \texttt{https://soundcloud.com/samplernn/sets},
+which we qualitatively found to have less noise than ours. 
+
+\subsubsection{WGAN}
+In all of our experiments, we use the Wasserstein GAN with gradient penalty
+(WGAN-GP), which we found makes the model converge better than regular
+WGAN~\cite{arjovsky2017wasserstein} or GAN~\cite{goodfellow2014generative}. 
+In our experiments, we trained a WGAN-GP to produce mel-spectrograms from 1
+target speaker \textit{against} a set of 101 speakers. On each critic iteration, we fed
+it with a batch of samples from one target speaker, and a batch of data
+uniformly sampled from the other speakers. We used two popular architectures
+for generator/critic pairs: \textit{DCGAN}~\cite{radford2015unsupervised} and
+\textit{ResNet}~\cite{ledig2016photo}. 
+
+Performing \textit{untargeted} attacks with the WGAN-GP (i.e., training the
+network to output speech samples that mimic the distribution of speech) is
+relatively straightforward: we simply train the WGAN-GP using all speakers in
+our dataset. However, the most natural attack is one that is \textit{targeted}:
+where the GAN is trained to directly fool a speaker recognition system, i.e., to
+produce samples that the system classifies as matching a target speaker with
+reasonable confidence.
+
+\subsubsection{WGAN-GP with modified objective function}
+A naive approach for targeted attacks is to train the GAN on the data of the
+single target speaker. A drawback of this approach is that the \textit{critic},
+and by consequence the \textit{generator}, does not have access to universal
+properties of speech\footnote{We draw a parallel with Universal Background
+Models in speech.}. To circumvent this problem, we rely on semi-supervised
+learning and propose a modification to the critic's objective function that
+allows it to learn to differentiate between not only real samples and generated
+samples, but also between real speech samples from a target speaker and real
+speech samples from other speakers. We do this by adding a term to the critic's
+loss that encourages its discriminator to classify real speech samples from
+untargeted speakers as fake: 
+\normalsize
+
+\tiny
+\begin{align}
+\medmath{
+    \underbrace{\underset{\boldsymbol{\widetilde{x}} \sim
+    \mathbb{P}_{g}}{\mathbb{E}}
+    \big[D(\boldsymbol{\widetilde{x}})\big]}_\text{Generated Samples}
+    \color{red} +  \underbrace{\alpha * \underset{\boldsymbol{\dot{x}} \sim
+    \mathbb{P}_{\dot{x}}}{\mathbb{E}}
+    \big[D(\boldsymbol{\dot{x}})\big]}_\text{Different Speakers} \color{black} -
+    \underbrace{\underset{\boldsymbol{x} \sim \mathbb{P}_{r}}{\mathbb{E}}
+    \big[D(\boldsymbol{x})\big]}_\text{Real Speaker}  + \underbrace{\lambda
+    \underset{\boldsymbol{\hat{x}} \sim \mathbb{P}_{\hat{x}}}{\mathbb{E}}
+    \big[(\lVert \nabla_{\boldsymbol{\hat{x}}} D(\boldsymbol{\hat{x}}) \rVert_2
+    - 1)^2\big]}_\text{Gradient Penalty}\label{eq:wgan_gp_mixed},
+}
+\end{align}
+\normalsize
+where $P_{\hat{x}}$ is the distribution of samples from other speakers and
+$\mathbf{\alpha}$ is a tunable scaling factor. Note that
+equation~\ref{eq:wgan_gp_mixed} is no longer a direct approximation of the
+Wasserstein distance. Rather, it provides a balance of the distance between both
+the fake distribution and real one, and the distance between other speakers'
+distribution and the target speaker's one. We refer to this objective function
+as \textbf{mixed loss}.
+
+Initially, we were able to converge the targeted loss model used the same
+parameters as \cite{gulrajani2017improved}, namely 5 critic iterations per
+generator iteration, a gradient penalty weight of 10, and batch size of 64. Both
+the generator and critic were trained using the Adam optimizer
+\cite{kingma2014adam}. However, under these parameters we found that the highest
+$\alpha$ weight we could successfully use was 0.1 (we found that not including
+this scaling factor led to serious overfitting and poor convergence of the GAN).
+
+In order to circumvent these problems and train a model with $\alpha$ set to 1,
+we made modifications to the setup, including setting the standard deviation of
+the DCGAN discriminator's weight initialization to 0.05 and iterations to 20. To
+accommodate the critic's access to additional data in the mixed loss function
+(4), we increased the generator's learning rate. Finally, we added Gaussian noise
+to the target speaker data to prevent overfitting. 
