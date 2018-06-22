@@ -7,10 +7,14 @@ PyTorch implementation of [Attacking Speaker Recognition Systems with Deep Gener
 ## Pre-requisites
 1. NVIDIA GPU + CUDA cuDNN
 
+## Data and pre-trained models:
+1. Audio data: `https://drive.google.com/open?id=1SWHhtyeFWo1cwDBOXXbfssa3Z9TTyPsw`
+2. Pre-trained models for Cathy (Blizzard): `https://drive.google.com/open?id=1tB9ogHA1IzXyW6NOZ7SiZjVhK2_1FkJX`
+
 ## Setup
 1. Clone this repo: `git clone https://github.com/NVIDIA/tacotron2.git`
 2. CD into this repo: `cd asrgen`
-3. Download the data and unzip it in this folder
+3. Download and unzip audio data into this repo
 4. Install python requirements: `pip install -r requirements.txt`
 
 ## Training
