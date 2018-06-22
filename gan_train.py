@@ -16,25 +16,26 @@ from utils import load_checkpoint, save_checkpoint
 torch.manual_seed(1)
 
 # ======================== PARAMS ==========================
+OUTPUT_DIRECTORY = 'speaker{}/run_0'.format(SPEAKER_ID)
+DATA_FOLDER = 'data_16khz'
+MODEL_PATH = None
+PLOT_FREQ = 100
+SAVE_FREQ = 500
+BATCH_SIZE = 64 # Batch size.
+BEGIN_ITERS = 00001
+END_ITERS = 500001  # How many iterations to train for
+SPEAKER_ID = 100
 CRITIC_ITERS = 10  # How many iterations to train the critic for
 LAMBDA = 10  # Gradient penalty lambda hyperparameter
 N_CHANNELS = 1
 DIM = 64
 LENGTH = 64
-BATCH_SIZE = 64 # Batch size.
-BEGIN_ITERS = 00001
-END_ITERS = 500001  # How many iterations to train for
 GLR = 1e-4
 DLR = 1e-4
 BETA = 1.0   # Mixed loss weight
-SPEAKER_ID = 100
 NAME = 'dcgan_speaker{}_beta{}_clr{}_grl{}'.format(
     SPEAKER_ID, str(BETA), str(DLR), str(GLR))
-OUTPUT_DIRECTORY = '/tts/runs/asrgen/speaker{}/run_0'.format(SPEAKER_ID)
-MODEL_PATH = None #
 REG_NOISE = 1e-5
-PLOT_FREQ = 100
-SAVE_FREQ = 500
 
 G_net = Generator(DIM).cuda()
 D_net = Discriminator(DIM).cuda()
