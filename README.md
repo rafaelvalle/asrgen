@@ -8,8 +8,8 @@ PyTorch implementation of [Attacking Speaker Recognition Systems with Deep Gener
 1. NVIDIA GPU + CUDA cuDNN
 
 ## Data and pre-trained models:
-1. Audio data: `https://drive.google.com/open?id=1SWHhtyeFWo1cwDBOXXbfssa3Z9TTyPsw`
-2. Pre-trained models for Cathy (Blizzard): `https://drive.google.com/open?id=1tB9ogHA1IzXyW6NOZ7SiZjVhK2_1FkJX`
+* [Partial audio data](https://drive.google.com/open?id=1SWHhtyeFWo1cwDBOXXbfssa3Z9TTyPsw)
+* [Pre-trained Generator and Discrminator using Cathy-Blizzard data](https://drive.google.com/open?id=1tB9ogHA1IzXyW6NOZ7SiZjVhK2_1FkJX)
 
 ## Setup
 1. Clone this repo: `git clone https://github.com/NVIDIA/tacotron2.git`
@@ -29,6 +29,6 @@ PyTorch implementation of [Attacking Speaker Recognition Systems with Deep Gener
 This implementation uses code from the following repos: [NVIDIA's Tacotron 2] (https://github.com/nvidia/tacotron2), [Martin Arjovsky](https://github.com/martinarjovsky/WassersteinGAN) and [Prem
 Seetharaman](https://github.com/pseeth/pytorch-stft).
 
-We are thankful to Prem Seetharaman and Markus Rabe for their feedback on the early draft of this paper.
+We are thankful to Prem Seetharaman and Markus Rabe for their feedback on the early draft of this paper. 
 
-
+We are grateful to NVIDIA for donating the Titan X used in this research.
