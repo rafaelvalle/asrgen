@@ -12,7 +12,7 @@ PyTorch implementation of [Attacking Speaker Recognition Systems with Deep Gener
 * [Pre-trained Generator and Discrminator using Cathy-Blizzard data](https://drive.google.com/open?id=1tB9ogHA1IzXyW6NOZ7SiZjVhK2_1FkJX)
 
 ## Setup
-1. Clone this repo: `git clone https://github.com/NVIDIA/tacotron2.git`
+1. Clone this repo: `git clone https://github.com/rafaelvalle/asrgen.git`
 2. CD into this repo: `cd asrgen`
 3. Download and unzip audio data into this repo
 4. Install python requirements: `pip install -r requirements.txt`
