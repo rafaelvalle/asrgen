@@ -54,7 +54,7 @@ if MODEL_PATH is not None:
 one = torch.FloatTensor([1]).cuda()
 mone = one * -1
 
-all_data = load_data('data_16khz', '*.wav')
+all_data = load_data(DATA_FOLDER, '*.wav')
 train_generator = iterate_minibatches(
     all_data['train'], SPEAKER_ID, BATCH_SIZE*2, length=LENGTH, shuffle=False)
 logger = Logger(OUTPUT_DIRECTORY)
