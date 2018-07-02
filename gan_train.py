@@ -16,23 +16,24 @@ from utils import load_checkpoint, save_checkpoint
 torch.manual_seed(1)
 
 # ======================== PARAMS ==========================
+SPEAKER_ID = 0
 OUTPUT_DIRECTORY = 'speaker{}/run_0'.format(SPEAKER_ID)
 DATA_FOLDER = 'data_16khz'
 MODEL_PATH = None
 PLOT_FREQ = 100
 SAVE_FREQ = 500
-BATCH_SIZE = 64 # Batch size.
-BEGIN_ITERS = 00001
-END_ITERS = 500001  # How many iterations to train for
-SPEAKER_ID = 100
-CRITIC_ITERS = 10  # How many iterations to train the critic for
+BATCH_SIZE = 64
+BEGIN_ITERS = 0
+END_ITERS = 10001
+CRITIC_ITERS = 5
 LAMBDA = 10  # Gradient penalty lambda hyperparameter
 N_CHANNELS = 1
 DIM = 64
 LENGTH = 64
 GLR = 1e-4
 DLR = 1e-4
-BETA = 1.0   # Mixed loss weight
+
+BETA = 0 if SPEAKER_ID is None else 1.0
 NAME = 'dcgan_speaker{}_beta{}_clr{}_grl{}'.format(
     SPEAKER_ID, str(BETA), str(DLR), str(GLR))
 REG_NOISE = 1e-5
@@ -54,10 +55,15 @@ if MODEL_PATH is not None:
 one = torch.FloatTensor([1]).cuda()
 mone = one * -1
 
+SAMPLE_SIZE = BATCH_SIZE * 2 if BETA else BATCH_SIZE
 all_data = load_data(DATA_FOLDER, '*.wav')
+SPEAKER_ID_OTHERS = range(50) if SPEAKER_ID is None else range(len(all_data['train']))
 train_generator = iterate_minibatches(
-    all_data['train'], SPEAKER_ID, BATCH_SIZE*2, length=LENGTH, shuffle=False)
+    all_data['train'], SPEAKER_ID, SPEAKER_ID_OTHERS, SAMPLE_SIZE,
+    length=LENGTH, shuffle=False)
+
 logger = Logger(OUTPUT_DIRECTORY)
+
 
 for iteration in range(BEGIN_ITERS, END_ITERS):
     start_time = time.time()
@@ -71,24 +77,25 @@ for iteration in range(BEGIN_ITERS, END_ITERS):
         reg_noise = torch.FloatTensor(
             BATCH_SIZE, DIM, DIM).normal_(0.0, REG_NOISE).cuda()
 
-        # real data from speaker and real data not from speaker, add reg. noise
+        # real data from speaker, add regularization noise
         data, labels = next(train_generator)
         real_data_spk = data[:BATCH_SIZE]
-        real_data_nspk = data[BATCH_SIZE:]
         real_data_spk = torch.autograd.Variable(real_data_spk).cuda()
-        real_data_nspk = torch.autograd.Variable(real_data_nspk).cuda()
         real_data_spk += reg_noise
 
-
         D_net.zero_grad()
-
         # train with real from target speaker
         D_real_spk = D_net(real_data_spk).mean()
         D_real_spk.backward(mone)
 
-        # train with real from other speakers
-        D_real_nspk = BETA * D_net(real_data_nspk).mean()
-        D_real_nspk.backward(one)
+        D_real_nspk = 0.0
+        if BETA:
+            # real data not from speaker
+            real_data_nspk = data[BATCH_SIZE:]
+            real_data_nspk = torch.autograd.Variable(real_data_nspk).cuda()
+            # train with real from other speakers
+            D_real_nspk = BETA * D_net(real_data_nspk).mean()
+            D_real_nspk.backward(one)
 
         # train with fake data
         noise = autograd.Variable(
