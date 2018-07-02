@@ -1,6 +1,3 @@
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pylab as plt
 import os
 from collections import defaultdict
 import torch
@@ -8,19 +5,29 @@ import numpy as np
 import glob
 from layers import TacotronSTFT
 from utils import load_wav_to_torch
+from torchvision import transforms
 MAX_WAV_VALUE = 32768.0
 SAMPLING_RATE = 8000
 
 
-def iterate_minibatches(dataset, lbl_id, batch_size, shuffle=False,
-                        forever=True, length=128, to_numpy=False):
+def iterate_minibatches(dataset, lbl_id, lbl_id_others, batch_size,
+                        shuffle=False, forever=True, length=128, to_numpy=False,
+                        one_hot_labels=True, apply_transform=False):
 
-    if lbl_id is not None:
-        batch_size = int(batch_size / 2)
+    # data augmentation for training speaker recognition
+    transformer = transforms.Compose([
+        lambda x: (x + 1) * 0.5,
+        lambda x: x + 0.0003*torch.log(1e3*torch.rand(x.size())+1),
+        transforms.ToPILImage(),
+        #transforms.RandomAffine((-3, 3)),
+        #transforms.RandomResizedCrop(64, (0.9, 1.0)),
+        # transforms.RandomHorizontalFlip(),
+        transforms.ToTensor(),
+        lambda x: (x.squeeze(1) * 2) - 1])
 
     while True:
         data, labels = [], []
-        if lbl_id is not None:
+        if isinstance(lbl_id, int):
             # sample target speaker
             start_ids = np.random.choice(
                 np.arange(dataset[lbl_id][0].shape[1] - length),
@@ -30,18 +37,26 @@ def iterate_minibatches(dataset, lbl_id, batch_size, shuffle=False,
                     for start_id in start_ids]
             labels = [lbl_id] * (batch_size)
 
+        if len(data) and apply_transform:
+            data = transformer(data)
+            data = (data * 2) - 1
+
         # sample other speakers
         other_ids = np.random.choice(
-            [i for i in range(len(dataset)) if i != lbl_id],
-            batch_size,
-            replace=True)
+            [i for i in lbl_id_others if i != lbl_id], batch_size, replace=True)
 
         for i in other_ids:
             start_id = np.random.randint(dataset[i][0].shape[1] - length)
-            data.append(dataset[i][0][:, start_id:start_id+length])
+            cur_data = dataset[i][0][:, start_id:start_id+length]
+            if apply_transform:
+                cur_data = transformer(cur_data.unsqueeze(0))
+            data.append(cur_data)
             labels.append(i)
 
-        labels = np.eye(len(dataset))[labels]
+        if one_hot_labels:
+            labels = np.eye(len(dataset))[labels]
+        else:
+            labels = np.array(labels, dtype=np.int64)
 
         # convert to torch.FloatTensor
         data = torch.stack(data)
