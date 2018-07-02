@@ -1,5 +1,31 @@
 import torch.nn as nn
 
+
+class SpeakerRecognitionModel(nn.Module):
+    def __init__(self, nc):
+        super(SpeakerRecognitionModel, self).__init__()
+        self.nc = nc
+        self.convs = nn.Sequential(
+            nn.Conv2d(1, 32, 3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(2),
+            nn.Conv2d(32, 64, 3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(2)
+        )
+        self.linears = nn.Sequential(
+            nn.Linear(64*16*16, 256),
+            nn.Dropout(0.5),
+            nn.Linear(256, self.nc)
+        )
+
+    def forward(self, x):
+        x = self.convs(x)
+        x = x.view(-1, 64*16*16)
+        x = self.linears(x)
+        return x
+
+
 class Generator(nn.Module):
     def __init__(self, DIM, bn=False):
         super(Generator, self).__init__()
