@@ -10,7 +10,7 @@ LENGTH = 64
 BATCH_SIZE = 256
 VAL_BATCH_SIZE = 1024
 TEST_BATCH_SIZE = 1024
-N_ITERS = int(1e5)
+N_ITERS = int(50000)
 
 # model params
 init_lr = 1e-4
@@ -49,8 +49,6 @@ for i in tqdm(range(N_ITERS)):
 
     y_hat = model(X)
     loss = loss_fn(y_hat, y)
-    _, predicted = torch.max(y_hat, 1)
-    accuracy = float((predicted == y).squeeze().sum()) / BATCH_SIZE
     loss.backward()
     optimizer.step()
 
@@ -60,6 +58,8 @@ for i in tqdm(range(N_ITERS)):
         param_group['lr'] = lr
 
     if i % 100 == 0:
+        _, predicted = torch.max(y_hat, 1)
+        accuracy = (predicted.data == y.data).float().squeeze().sum() / BATCH_SIZE
         print("Iteration {}, loss {}, accuracy {}, lr {}".format(
             i, float(loss), accuracy, lr))
         with torch.no_grad():
@@ -68,7 +68,7 @@ for i in tqdm(range(N_ITERS)):
             y_hat = model(X)
 
             _, predicted = torch.max(y_hat, 1)
-            accuracy = float((predicted == y).squeeze().sum()) / VAL_BATCH_SIZE
+            accuracy = (predicted.data == y.data).float().squeeze().sum() / VAL_BATCH_SIZE
             print("Validation accuracy {}".format(accuracy))
 
 with torch.no_grad():
@@ -79,6 +79,8 @@ with torch.no_grad():
         y_hat = model(X)
 
         _, predicted = torch.max(y_hat, 1)
-        accuracy += float((predicted == y).squeeze().sum())
-    print("Test accuracy {}".format(
-        accuracy / (N_TEST_RUNS * TEST_BATCH_SIZE)))
+        accuracy = (predicted.data == y.data).float().squeeze().sum()
+    accuracy = accuracy / (N_TEST_RUNS * TEST_BATCH_SIZE)
+    print("Test accuracy {}".format(accuracy))
+
+torch.save({'model': model.state_dict()}, 'sr_model.pt')
