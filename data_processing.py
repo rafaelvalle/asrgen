@@ -11,7 +11,7 @@ SAMPLING_RATE = 8000
 
 
 def iterate_minibatches(dataset, lbl_id, lbl_id_others, batch_size,
-                        shuffle=False, forever=True, length=128, to_numpy=False,
+                        shuffle=False, forever=True, length=128, to_torch=True,
                         one_hot_labels=True, apply_transform=False):
 
     # data augmentation for training speaker recognition
@@ -58,12 +58,9 @@ def iterate_minibatches(dataset, lbl_id, lbl_id_others, batch_size,
         else:
             labels = np.array(labels, dtype=np.int64)
 
-        # convert to torch.FloatTensor
-        data = torch.stack(data)
-        labels = torch.from_numpy(labels)
-        if to_numpy:
-            data = data.data.cpu().numpy()
-            labels = labels.numpy()
+        if to_torch:
+            data = torch.autograd.Variable(torch.stack(data))
+            labels = torch.autograd.Variable(torch.from_numpy(labels).long())
 
         if shuffle:
             rand_ids = np.random.permutation(np.arange(len(data)))
