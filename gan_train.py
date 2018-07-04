@@ -16,9 +16,11 @@ torch.manual_seed(1)
 
 # ======================== PARAMS ==========================
 SPEAKER_ID = 101
-SPEAKER_ID_OTHERS = range(102) # list of others speaker ids, target is ignored
+SPEAKER_ID_OTHERS = range(102)
+CRITIC_ITERS = 10
 BETA = 0 if (SPEAKER_ID is None or not len(SPEAKER_ID_OTHERS)) else 1.0
-OUTPUT_DIRECTORY = '/tts/runs/asrgen/speaker{}/run_0_train'.format(SPEAKER_ID)
+REG_NOISE = 1e-5
+OUTPUT_DIRECTORY = '/tts/runs/asrgen/speaker{}/run_0_val_test_10citers'.format(SPEAKER_ID)
 DATA_FOLDER = 'data_16khz'
 USE_TRAIN = True
 MODEL_PATH = None
@@ -27,7 +29,6 @@ SAVE_FREQ = 500
 BATCH_SIZE = 64
 BEGIN_ITERS = 0
 END_ITERS = 30001
-CRITIC_ITERS = 5
 LAMBDA = 10  # Gradient penalty lambda hyperparameter
 N_CHANNELS = 1
 DIM = 64
@@ -37,7 +38,6 @@ DLR = 1e-4
 
 NAME = 'dcgan_speaker{}_beta{}_clr{}_grl{}'.format(
     SPEAKER_ID, str(BETA), str(DLR), str(GLR))
-REG_NOISE = 1e-5
 
 G_net = Generator(DIM).cuda()
 D_net = Discriminator(DIM).cuda()
