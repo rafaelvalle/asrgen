@@ -5,7 +5,7 @@ from models import SpeakerRecognitionModel
 
 # training params
 SPEAKER_ID = None
-SPEAKER_ID_OTHERS = None
+SPEAKER_ID_OTHERS = range(0, 102)
 LENGTH = 64
 BATCH_SIZE = 256
 VAL_BATCH_SIZE = 1024
@@ -14,6 +14,7 @@ N_ITERS = int(50000)
 
 # model params
 init_lr = 1e-4
+weight_decay = 1e-4
 
 # load data
 data = load_data('data_16khz', '*.wav')
@@ -27,7 +28,7 @@ data_training = iterate_minibatches(
     apply_transform=False)
 
 data_validation = iterate_minibatches(
-    data['valid'], SPEAKER_ID, SPEAKER_ID_OTHERS, VAL_BATCH_SIZE,
+    data['validation'], SPEAKER_ID, SPEAKER_ID_OTHERS, VAL_BATCH_SIZE,
     shuffle=False, forever=True, length=LENGTH, one_hot_labels=False)
 
 data_testing = iterate_minibatches(
@@ -36,14 +37,14 @@ data_testing = iterate_minibatches(
 
 model = SpeakerRecognitionModel(N_CLASSES).cuda()
 optimizer = torch.optim.Adam(
-    model.parameters(), lr=init_lr, betas=(0.5, 0.9), weight_decay=1e-4)
+    model.parameters(), lr=init_lr, betas=(0.5, 0.9), weight_decay=weight_decay)
 loss_fn = torch.nn.CrossEntropyLoss()
 
 model.train()
 
 for i in tqdm(range(N_ITERS)):
     X, y = next(data_training)
-    X, y = X.cuda(), y.cuda()
+    X, y = torch.autograd.Variable(X).cuda(), torch.autograd.Variable(y).cuda()
     X = X.unsqueeze(1)
     model.zero_grad()
 
@@ -59,27 +60,29 @@ for i in tqdm(range(N_ITERS)):
 
     if i % 100 == 0:
         _, predicted = torch.max(y_hat, 1)
-        accuracy = (predicted.data == y.data).float().squeeze().sum() / BATCH_SIZE
+        accuracy = (predicted.data == y.data).float().sum() / BATCH_SIZE
         print("Iteration {}, loss {}, accuracy {}, lr {}".format(
             i, float(loss), accuracy, lr))
+
         with torch.no_grad():
             X, y = next(data_validation)
-            X, y = X.unsqueeze(1).cuda(), y.cuda()
+            X, y = torch.autograd.Variable(X).cuda(), torch.autograd.Variable(y).cuda()
+            X = X.unsqueeze(1)
             y_hat = model(X)
-
             _, predicted = torch.max(y_hat, 1)
-            accuracy = (predicted.data == y.data).float().squeeze().sum() / VAL_BATCH_SIZE
+            accuracy = (predicted.data == y.data).float().sum() / VAL_BATCH_SIZE
             print("Validation accuracy {}".format(accuracy))
 
 with torch.no_grad():
     accuracy = 0.0
     for _ in range(N_TEST_RUNS):
         X, y = next(data_testing)
-        X, y = X.unsqueeze(1).cuda(), y.cuda()
+        X, y = torch.autograd.Variable(X).cuda(), torch.autograd.Variable(y).cuda()
+        X = X.unsqueeze(1)
         y_hat = model(X)
 
         _, predicted = torch.max(y_hat, 1)
-        accuracy = (predicted.data == y.data).float().squeeze().sum()
+        accuracy += (predicted.data == y.data).float().sum()
     accuracy = accuracy / (N_TEST_RUNS * TEST_BATCH_SIZE)
     print("Test accuracy {}".format(accuracy))
 

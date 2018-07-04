@@ -37,13 +37,12 @@ def iterate_minibatches(dataset, lbl_id, lbl_id_others, batch_size,
                     for start_id in start_ids]
             labels = [lbl_id] * (batch_size)
 
-        if len(data) and apply_transform:
-            data = transformer(data)
-            data = (data * 2) - 1
-
         # sample other speakers
-        other_ids = np.random.choice(
-            [i for i in lbl_id_others if i != lbl_id], batch_size, replace=True)
+        other_ids = []
+        if len(lbl_id_others):
+            other_ids = np.random.choice(
+                [i for i in lbl_id_others if i != lbl_id],
+                batch_size, replace=True)
 
         for i in other_ids:
             start_id = np.random.randint(dataset[i][0].shape[1] - length)
@@ -53,14 +52,18 @@ def iterate_minibatches(dataset, lbl_id, lbl_id_others, batch_size,
             data.append(cur_data)
             labels.append(i)
 
+        # data augmentation
+        if len(data) and apply_transform:
+            data = transformer(data)
+
         if one_hot_labels:
             labels = np.eye(len(dataset))[labels]
         else:
             labels = np.array(labels, dtype=np.int64)
 
         if to_torch:
-            data = torch.autograd.Variable(torch.stack(data))
-            labels = torch.autograd.Variable(torch.from_numpy(labels).long())
+            data = torch.stack(data)
+            labels = torch.from_numpy(labels).long()
 
         if shuffle:
             rand_ids = np.random.permutation(np.arange(len(data)))
@@ -96,6 +99,6 @@ def load_data(datapath, glob_file_str, scale=True, data_split=[0.8, 0.1]):
             train_end = int(mel_spec.size(1)*data_split[0])
             val_end = int(mel_spec.size(1)*(data_split[0]+data_split[1]))
             data['train'].append([mel_spec[:, :train_end], label])
-            data['valid'].append([mel_spec[:, train_end:val_end], label])
+            data['validation'].append([mel_spec[:, train_end:val_end], label])
             data['test'].append([mel_spec[:, val_end:], label])
     return data

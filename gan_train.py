@@ -1,5 +1,4 @@
 """ adapted from https://github.com/martinarjovsky/WassersteinGAN """
-import os
 import time
 
 import torch
@@ -16,15 +15,18 @@ from utils import load_checkpoint, save_checkpoint
 torch.manual_seed(1)
 
 # ======================== PARAMS ==========================
-SPEAKER_ID = 0
-OUTPUT_DIRECTORY = 'speaker{}/run_0'.format(SPEAKER_ID)
+SPEAKER_ID = 101
+SPEAKER_ID_OTHERS = range(102) # list of others speaker ids, target is ignored
+BETA = 0 if (SPEAKER_ID is None or not len(SPEAKER_ID_OTHERS)) else 1.0
+OUTPUT_DIRECTORY = '/tts/runs/asrgen/speaker{}/run_0_train'.format(SPEAKER_ID)
 DATA_FOLDER = 'data_16khz'
+USE_TRAIN = True
 MODEL_PATH = None
 PLOT_FREQ = 100
 SAVE_FREQ = 500
 BATCH_SIZE = 64
 BEGIN_ITERS = 0
-END_ITERS = 10001
+END_ITERS = 30001
 CRITIC_ITERS = 5
 LAMBDA = 10  # Gradient penalty lambda hyperparameter
 N_CHANNELS = 1
@@ -33,7 +35,6 @@ LENGTH = 64
 GLR = 1e-4
 DLR = 1e-4
 
-BETA = 0 if SPEAKER_ID is None else 1.0
 NAME = 'dcgan_speaker{}_beta{}_clr{}_grl{}'.format(
     SPEAKER_ID, str(BETA), str(DLR), str(GLR))
 REG_NOISE = 1e-5
@@ -57,9 +58,14 @@ mone = one * -1
 
 SAMPLE_SIZE = BATCH_SIZE * 2 if BETA else BATCH_SIZE
 all_data = load_data(DATA_FOLDER, '*.wav')
-SPEAKER_ID_OTHERS = range(50) if SPEAKER_ID is None else range(len(all_data['train']))
+if USE_TRAIN:
+    data = all_data['train']
+else:
+    data = [[torch.cat((all_data['validation'][i][0], all_data['test'][i][0]), dim=1), all_data['validation'][i][1]]
+            for i in range(len(all_data['validation']))]
+
 train_generator = iterate_minibatches(
-    all_data['train'], SPEAKER_ID, SPEAKER_ID_OTHERS, SAMPLE_SIZE,
+    data, SPEAKER_ID, SPEAKER_ID_OTHERS, SAMPLE_SIZE,
     length=LENGTH, shuffle=False)
 
 logger = Logger(OUTPUT_DIRECTORY)
@@ -74,8 +80,8 @@ for iteration in range(BEGIN_ITERS, END_ITERS):
         p.requires_grad = True  # they are set to False below in G_net update
 
     for iter_d in range(CRITIC_ITERS):
-        reg_noise = torch.FloatTensor(
-            BATCH_SIZE, DIM, DIM).normal_(0.0, REG_NOISE).cuda()
+        reg_noise = torch.autograd.Variable(torch.FloatTensor(
+            BATCH_SIZE, DIM, DIM).normal_(0.0, REG_NOISE)).cuda()
 
         # real data from speaker, add regularization noise
         data, labels = next(train_generator)

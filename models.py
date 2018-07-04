@@ -14,9 +14,9 @@ class SpeakerRecognitionModel(nn.Module):
             nn.MaxPool2d(2)
         )
         self.linears = nn.Sequential(
-            nn.Linear(64*16*16, 256),
+            nn.Linear(64*16*16, 2048),
             nn.Dropout(0.5),
-            nn.Linear(256, self.nc)
+            nn.Linear(2048, self.nc)
         )
 
     def forward(self, x):
