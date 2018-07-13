@@ -16,13 +16,12 @@ torch.manual_seed(1)
 
 # ======================== PARAMS ==========================
 SPEAKER_ID = 101
-SPEAKER_ID_OTHERS = range(102)
+SPEAKER_ID_OTHERS = range(101)
 CRITIC_ITERS = 10
 BETA = 0 if (SPEAKER_ID is None or not len(SPEAKER_ID_OTHERS)) else 1.0
 REG_NOISE = 1e-5
-OUTPUT_DIRECTORY = '/tts/runs/asrgen/speaker{}/run_0_val_test_10citers'.format(SPEAKER_ID)
 DATA_FOLDER = 'data_16khz'
-USE_TRAIN = True
+USE_TRAIN = False
 MODEL_PATH = None
 PLOT_FREQ = 100
 SAVE_FREQ = 500
@@ -36,6 +35,8 @@ LENGTH = 64
 GLR = 1e-4
 DLR = 1e-4
 
+OUTPUT_DIRECTORY = '/tts/runs/asrgen/speaker{}/run_0_val_usetrain{}_citers{}_regnoise{}'.format(
+    SPEAKER_ID, USE_TRAIN, CRITIC_ITERS, REG_NOISE)
 NAME = 'dcgan_speaker{}_beta{}_clr{}_grl{}'.format(
     SPEAKER_ID, str(BETA), str(DLR), str(GLR))
 
