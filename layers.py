@@ -14,7 +14,7 @@ class TacotronSTFT(torch.nn.Module):
     def __init__(self, filter_length=800, hop_length=200, win_length=800,
                  n_mel_channels=80, min_level_db=-100, ref_level_db=20,
                  sampling_rate=16000, representation='drc', mel_fmin=0,
-                 mel_fmax=8000, C=1000):
+                 mel_fmax=8000, C=1000, norm=True, htk=False):
         super(TacotronSTFT, self).__init__()
         self.min_level_db = min_level_db
         self.ref_level_db = ref_level_db
@@ -24,7 +24,8 @@ class TacotronSTFT(torch.nn.Module):
         self.representation = representation
         self.C = 1000
         mel_basis = librosa_mel_fn(sampling_rate, filter_length, n_mel_channels,
-                                   fmin=mel_fmin, fmax=mel_fmax)
+                                   fmin=mel_fmin, fmax=mel_fmax,
+                                   norm=norm, htk=htk)
         mel_basis = torch.from_numpy(mel_basis).float()
         self.register_buffer('mel_basis', mel_basis)
 
