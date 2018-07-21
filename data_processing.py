@@ -1,6 +1,7 @@
 import os
 from collections import defaultdict
 import torch
+from torch.autograd import Variable
 import numpy as np
 import glob
 from layers import TacotronSTFT
@@ -19,8 +20,8 @@ def iterate_minibatches(dataset, lbl_id, lbl_id_others, batch_size,
         lambda x: (x + 1) * 0.5,
         lambda x: x + 0.0003*torch.log(1e3*torch.rand(x.size())+1),
         transforms.ToPILImage(),
-        #transforms.RandomAffine((-3, 3)),
-        #transforms.RandomResizedCrop(64, (0.9, 1.0)),
+        # transforms.RandomAffine((-3, 3)),
+        # transforms.RandomResizedCrop(64, (0.9, 1.0)),
         # transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
         lambda x: (x.squeeze(1) * 2) - 1])
@@ -41,8 +42,7 @@ def iterate_minibatches(dataset, lbl_id, lbl_id_others, batch_size,
         other_ids = []
         if len(lbl_id_others):
             other_ids = np.random.choice(
-                [i for i in lbl_id_others if i != lbl_id],
-                batch_size, replace=True)
+                lbl_id_others, batch_size, replace=True)
 
         for i in other_ids:
             start_id = np.random.randint(dataset[i][0].shape[1] - length)
@@ -75,12 +75,14 @@ def iterate_minibatches(dataset, lbl_id, lbl_id_others, batch_size,
             break
 
 
-def load_data(datapath, glob_file_str, scale=True, data_split=[0.8, 0.1]):
+def load_data(datapath, glob_file_str, n_mel_channels, mel_norm=1,
+              mel_htk=False, scale=True, data_split=[0.8, 0.1]):
     data = defaultdict(list)
     stft = TacotronSTFT(
         filter_length=1024, hop_length=160,
-        win_length=1024, sampling_rate=16000, n_mel_channels=64,
-        mel_fmin=0, mel_fmax=None, representation='asrgen')
+        win_length=1024, sampling_rate=16000, n_mel_channels=n_mel_channels,
+        mel_fmin=0, mel_fmax=None, representation='asrgen',
+        norm=mel_norm, htk=mel_htk)
 
     for folderpath in sorted(glob.glob(os.path.join(datapath, '*/'))):
         label = os.path.basename(os.path.normpath(folderpath))
@@ -91,7 +93,7 @@ def load_data(datapath, glob_file_str, scale=True, data_split=[0.8, 0.1]):
             audio_norm = audio / MAX_WAV_VALUE
             audio_norm = audio_norm / torch.max(audio_norm.abs())
             audio_norm = audio_norm.unsqueeze(0)
-            audio_norm = torch.autograd.Variable(audio_norm, requires_grad=False)
+            audio_norm = Variable(audio_norm, requires_grad=False)
             mel_spec = stft.mel_spectrogram(audio_norm)[0]
             mel_spec -= mel_spec.min()
             mel_spec = mel_spec / torch.max(mel_spec)
