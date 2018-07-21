@@ -14,23 +14,26 @@ class SpeakerRecognitionModel(nn.Module):
             nn.MaxPool2d(2)
         )
         self.linears = nn.Sequential(
-            nn.Linear(64*16*16, 2048),
+            nn.Linear(64*20*20, 2048),
             nn.Dropout(0.5),
             nn.Linear(2048, self.nc)
         )
 
     def forward(self, x):
         x = self.convs(x)
-        x = x.view(-1, 64*16*16)
+        x = x.view(-1, 64*20*20)
         x = self.linears(x)
         return x
 
 
 class Generator(nn.Module):
-    def __init__(self, DIM, bn=False):
+    def __init__(self, DIM, n_mel_channels, length, base_dim=4, bn=False):
         super(Generator, self).__init__()
         self.DIM = DIM
-        self.preprocess = nn.Linear(128, 4*4*8*DIM)
+        self.n_mel_channels = n_mel_channels
+        self.length = length
+        self.base_dim = base_dim
+        self.preprocess = nn.Linear(128, base_dim*base_dim*8*DIM)
         self.bn = nn.BatchNorm2d(8*DIM)
         self.relu = nn.ReLU(True)
 
@@ -54,7 +57,7 @@ class Generator(nn.Module):
 
     def forward(self, input):
         output = self.preprocess(input)
-        output = output.view(-1, 8*self.DIM, 4, 4)
+        output = output.view(-1, 8*self.DIM, self.base_dim, self.base_dim)
         output = self.bn(output)
         output = self.relu(output)
         output = self.block1(output)
@@ -62,7 +65,7 @@ class Generator(nn.Module):
         output = self.block3(output)
         output = self.deconv_out(output)
         output = self.tanh(output)
-        return output.view(-1, self.DIM, self.DIM)
+        return output.view(-1, self.n_mel_channels, self.length)
 
 
 class Discriminator(nn.Module):
