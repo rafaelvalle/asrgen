@@ -29,13 +29,13 @@ class Logger(SummaryWriter):
 
         self.add_image(
             "mel_real",
-            plot_spectrogram_to_numpy(mel_real, 6, 5),
+            plot_spectrogram_to_numpy(mel_real, 8, 6),
             iteration)
         self.add_image(
             "mel_real+noise",
-            plot_spectrogram_to_numpy(mel_real_noisy, 6, 5),
+            plot_spectrogram_to_numpy(mel_real_noisy, 8, 6),
             iteration)
         self.add_image(
             "mel_fake",
-            plot_spectrogram_to_numpy(mel_fake, 6, 5),
+            plot_spectrogram_to_numpy(mel_fake, 8, 6),
             iteration)
