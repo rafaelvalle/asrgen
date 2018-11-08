@@ -79,7 +79,7 @@ with torch.no_grad():
         y_hat = model(X)
 
         _, predicted = torch.max(y_hat, 1)
-        accuracy = (predicted.data == y.data).float().squeeze().sum()
+        accuracy += (predicted.data == y.data).float().squeeze().sum()
     accuracy = accuracy / (N_TEST_RUNS * TEST_BATCH_SIZE)
     print("Test accuracy {}".format(accuracy))
 
